@@ -26,7 +26,7 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center text-white bg-cover bg-center p-6"
-         style={{ backgroundImage: "url('/teste.png')" }}>
+         style={{ backgroundImage: "url('/teste.jpg')" }}>
       <Hearts />
       <div className="z-10 max-w-3xl text-center p-8 rounded-2xl shadow-2xl border border-pink-500/30"
            style={{ background: 'linear-gradient(to bottom right, rgba(0,0,0,0.8), rgba(88,28,135,0.8))' }}>
@@ -36,7 +36,7 @@ export default function App() {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
-            }}>🎁 Feliz Aniversário, Mari! 🎉</h1>
+            }}>🎁 Feliz Aniversário, Meu Solzinho! 🎉</h1>
         
         {showInstructions && !showFinalMessage && (
           <div className="mb-8 text-lg">
@@ -45,7 +45,7 @@ export default function App() {
                 Você ganhou <strong style={{ color: '#fcd34d' }}>5 presentes surpresa</strong>! 🥰
               </p>
               <p>
-                Eles vão ser sorteados em uma roleta muito especial. Clique em <strong style={{ color: '#fcd34d' }}>"Parar"</strong> a cada giro e descubra o que ganhou! 💝
+                Eles vão ser sorteados em uma roleta muito especial. A roleta vai girar e parar automaticamente para revelar cada presente! 💝
               </p>
             </div>
             <button
@@ -81,7 +81,7 @@ export default function App() {
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text'
-                }}>✨ Mari, seus prêmios são:</h2>
+                }}>✨ Meu Solzinho, seus prêmios são:</h2>
             <ul style={{ background: 'rgba(236,72,153,0.2)', padding: '1.5rem', borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {finalPrizes.map((prize, index) => (
                 <li key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', fontSize: '1.25rem' }}>

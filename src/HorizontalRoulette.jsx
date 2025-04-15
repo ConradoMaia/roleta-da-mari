@@ -27,6 +27,7 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
   const [showPrizeAnimation, setShowPrizeAnimation] = useState(false);
   const containerRef = useRef(null);
   const animationRef = useRef(null);
+  const timerRef = useRef(null);
 
   const prizeWidth = 180;
 
@@ -38,10 +39,17 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
       const speedInterval = setInterval(() => {
         setSpeed(prevSpeed => Math.min(prevSpeed + 1, 15));
       }, 500);
+
+      // Define um tempo aleatório entre 3 e 5 segundos para parar a roleta
+      const stopTime = Math.random() * 2000 + 3000; // entre 3 e 5 segundos
+      timerRef.current = setTimeout(() => {
+        slowDown();
+      }, stopTime);
       
       return () => {
         cancelAnimationFrame(animationRef.current);
         clearInterval(speedInterval);
+        clearTimeout(timerRef.current);
       };
     } else {
       cancelAnimationFrame(animationRef.current);
@@ -61,24 +69,17 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
     animationRef.current = requestAnimationFrame(scroll);
   };
 
-  const stopRoll = () => {
-    if (!rolling || count >= 5) return;
-
-    // Desacelera gradualmente
-    const slowDown = () => {
-      setSpeed(prevSpeed => {
-        if (prevSpeed <= 1) {
-          cancelAnimationFrame(animationRef.current);
-          setRolling(false);
-          selectPrize();
-          return 0;
-        }
-        setTimeout(slowDown, 100);
-        return prevSpeed * 0.9;
-      });
-    };
-    
-    slowDown();
+  const slowDown = () => {
+    setSpeed(prevSpeed => {
+      if (prevSpeed <= 1) {
+        cancelAnimationFrame(animationRef.current);
+        setRolling(false);
+        selectPrize();
+        return 0;
+      }
+      setTimeout(slowDown, 100);
+      return prevSpeed * 0.9;
+    });
   };
 
   const selectPrize = () => {
@@ -163,20 +164,6 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
       </div>
 
       <div className="mt-6 flex flex-col items-center gap-2">
-        {count < 5 && (
-          <button
-            onClick={stopRoll}
-            disabled={!rolling}
-            className={`px-8 py-3 text-xl font-bold rounded-full shadow-lg transform hover:scale-105 transition-all ${!rolling ? 'opacity-50 cursor-not-allowed' : ''}`}
-            style={{
-              background: 'linear-gradient(to right, #fcd34d, #fbbf24)',
-              color: '#be185d',
-              animation: rolling ? 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite' : 'none'
-            }}
-          >
-            {rolling ? "Parar" : "Aguarde..."}
-          </button>
-        )}
         {count > 0 && (
           <div className="flex items-center gap-2 mt-2">
             <p className="text-white text-lg">Giros restantes: <span className="font-bold text-yellow-300">{5 - count}</span></p>
