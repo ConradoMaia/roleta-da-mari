@@ -1,75 +1,119 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-
-const premios = ["Tênis", "Massagem", "Sushi", "Plantas", "Presente surpresa"];
+import HorizontalRoulette from "./HorizontalRoulette";
+import Hearts from "./Hearts";
+import "./App.css";
 
 export default function App() {
-  const [girosRestantes, setGirosRestantes] = useState(5);
-  const [girando, setGirando] = useState(false);
-  const [premioAtual, setPremioAtual] = useState(null);
-  const [premiosObtidos, setPremiosObtidos] = useState([]);
+  const [finalPrizes, setFinalPrizes] = useState([]);
+  const [showFinalMessage, setShowFinalMessage] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(true);
 
-  const girarRoleta = () => {
-    if (girando || girosRestantes === 0) return;
-    setGirando(true);
+  // Ícones para os prêmios
+  const prizeIcons = {
+    "Tênis": "👟",
+    "Massagem": "💆‍♀️",
+    "Sushi": "🍣",
+    "Plantas": "🌱",
+    "Presente Surpresa": "🎁"
+  };
 
-    const indexPremio = Math.floor(Math.random() * premios.length);
-    const premio = premios[indexPremio];
-
+  const handlePrizeSelected = (prizes) => {
+    setFinalPrizes(prizes);
     setTimeout(() => {
-      setPremioAtual(premio);
-      setPremiosObtidos([...premiosObtidos, premio]);
-      setGirosRestantes(girosRestantes - 1);
-      setGirando(false);
-    }, 2500);
+      setShowFinalMessage(true);
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen bg-pink-100 flex flex-col items-center justify-center p-4 text-center">
-      <h1 className="text-3xl md:text-4xl font-bold mb-4 text-pink-700">Surpresinha da Mari 💖</h1>
+    <div className="relative min-h-screen flex flex-col items-center justify-center text-white bg-cover bg-center p-6"
+         style={{ backgroundImage: "url('/teste.png')" }}>
+      <Hearts />
+      <div className="z-10 max-w-3xl text-center p-8 rounded-2xl shadow-2xl border border-pink-500/30"
+           style={{ background: 'linear-gradient(to bottom right, rgba(0,0,0,0.8), rgba(88,28,135,0.8))' }}>
+        <h1 className="text-4xl font-bold mb-6" 
+            style={{ 
+              background: 'linear-gradient(to right, #f472b6, #a855f7)', 
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>🎁 Feliz Aniversário, Mari! 🎉</h1>
+        
+        {showInstructions && !showFinalMessage && (
+          <div className="mb-8 text-lg">
+            <div style={{ background: 'rgba(236,72,153,0.2)', padding: '1.5rem', borderRadius: '0.75rem', marginBottom: '1.5rem' }}>
+              <p className="text-xl mb-3">
+                Você ganhou <strong style={{ color: '#fcd34d' }}>5 presentes surpresa</strong>! 🥰
+              </p>
+              <p>
+                Eles vão ser sorteados em uma roleta muito especial. Clique em <strong style={{ color: '#fcd34d' }}>"Parar"</strong> a cada giro e descubra o que ganhou! 💝
+              </p>
+            </div>
+            <button
+              onClick={() => setShowInstructions(false)}
+              style={{
+                marginTop: '1rem',
+                padding: '0.75rem 2rem',
+                background: 'linear-gradient(to right, #ec4899, #a855f7)',
+                color: 'white',
+                fontSize: '1.25rem',
+                fontWeight: 'bold',
+                borderRadius: '9999px',
+                transition: 'all 0.3s',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              Começar!
+            </button>
+          </div>
+        )}
 
-      {girosRestantes > 0 ? (
-        <>
-          <motion.div
-            animate={{ rotate: girando ? 1440 : 0 }}
-            transition={{ duration: 2.5, ease: "easeInOut" }}
-            className="w-64 h-64 rounded-full border-8 border-pink-400 flex items-center justify-center text-white text-xl font-semibold bg-gradient-to-br from-pink-400 to-pink-600 shadow-xl mb-6"
-          >
-            {girando ? "Girando..." : premioAtual || "Clique para girar"}
-          </motion.div>
+        {!showInstructions && !showFinalMessage && (
+          <HorizontalRoulette onPrizeSelected={handlePrizeSelected} />
+        )}
 
-          <button
-            onClick={girarRoleta}
-            disabled={girando}
-            className="bg-pink-600 hover:bg-pink-700 text-white font-bold py-2 px-6 rounded-2xl shadow-md disabled:opacity-50"
-          >
-            Girar roleta ({girosRestantes} restantes)
-          </button>
-        </>
-      ) : (
-        <div className="bg-white p-6 rounded-2xl shadow-xl max-w-md">
-          <h2 className="text-2xl font-bold text-pink-600 mb-4">🎉 Parabéns, Mari!</h2>
-          <p className="text-gray-700 mb-2">
-            Você girou a roleta do amor e ganhou mais que prêmios…
-          </p>
-          <p className="text-gray-700 mb-2">
-            Ganhou um coração que gira de felicidade só por te ter por perto 💕
-          </p>
-          <p className="text-gray-700 mb-4">
-            Cada surpresa é só um jeitinho diferente de dizer: <strong>eu amo você!</strong>
-          </p>
-          <p className="text-pink-500 font-semibold">Te amo demais! — Conrado 💌</p>
-
-          <div className="mt-4">
-            <h3 className="text-lg font-semibold text-pink-700">Seus prêmios:</h3>
-            <ul className="mt-2 text-gray-800">
-              {premiosObtidos.map((p, i) => (
-                <li key={i}>🎁 {p}</li>
+        {showFinalMessage && (
+          <div className="space-y-6 text-lg">
+            <h2 className="text-3xl font-bold" 
+                style={{ 
+                  background: 'linear-gradient(to right, #f472b6, #a855f7)', 
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>✨ Mari, seus prêmios são:</h2>
+            <ul style={{ background: 'rgba(236,72,153,0.2)', padding: '1.5rem', borderRadius: '0.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {finalPrizes.map((prize, index) => (
+                <li key={index} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', fontSize: '1.25rem' }}>
+                  <span style={{ fontSize: '1.875rem' }}>{prizeIcons[prize]}</span>
+                  <span style={{ fontWeight: 'bold', color: '#fcd34d' }}>{prize}</span>
+                </li>
               ))}
             </ul>
+            <div style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '0.75rem', background: 'rgba(88,28,135,0.3)' }}>
+              <p className="italic text-xl">
+                Espero que tenha gostado da surpresa... Agora é só me cobrar cada presentinho com muito amor 💘 Te amo! 💫
+              </p>
+            </div>
+            <button 
+              onClick={() => window.location.reload()} 
+              style={{
+                marginTop: '1.5rem',
+                padding: '0.5rem 1.5rem',
+                background: 'linear-gradient(to right, #ec4899, #a855f7)',
+                color: 'white',
+                fontWeight: 'bold',
+                borderRadius: '9999px',
+                transition: 'all 0.3s',
+              }}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+            >
+              Jogar novamente
+            </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

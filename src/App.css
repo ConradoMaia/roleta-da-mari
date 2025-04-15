@@ -28,6 +28,12 @@
   color: #61dafb;
 }
 
+.background-foto {
+  background-image: url('/public/teste.jpg'); /* substitua pelo caminho da sua imagem */
+  background-size: cover;
+  background-position: center;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -35,4 +41,92 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.heart {
+  position: absolute;
+  color: #ff69b4;
+  font-size: 24px;
+  animation: fall linear infinite;
+  content: '❤️';
+  display: inline-block;
+  opacity: 0.8;
+}
+
+.heart::before {
+  content: '❤️';
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Gera corações com diferentes posições, tamanhos e velocidades */
+.heart-0 { left: 10%; animation-duration: 6s; font-size: 20px; }
+.heart-1 { left: 25%; animation-duration: 5s; font-size: 28px; }
+.heart-2 { left: 40%; animation-duration: 7s; font-size: 24px; }
+.heart-3 { left: 15%; animation-duration: 6.5s; font-size: 22px; }
+.heart-4 { left: 70%; animation-duration: 5.5s; font-size: 26px; }
+.heart-5 { left: 85%; animation-duration: 6.8s; font-size: 30px; }
+.heart-6 { left: 50%; animation-duration: 7.2s; font-size: 20px; }
+.heart-7 { left: 33%; animation-duration: 5.8s; font-size: 24px; }
+.heart-8 { left: 60%; animation-duration: 6.3s; font-size: 25px; }
+.heart-9 { left: 77%; animation-duration: 7s; font-size: 28px; }
+.heart-10 { left: 5%; animation-duration: 6.7s; font-size: 22px; }
+.heart-11 { left: 43%; animation-duration: 6.2s; font-size: 26px; }
+.heart-12 { left: 90%; animation-duration: 5.6s; font-size: 20px; }
+.heart-13 { left: 65%; animation-duration: 7.3s; font-size: 24px; }
+.heart-14 { left: 38%; animation-duration: 6.1s; font-size: 27px; }
+
+/* Animações adicionais para a roleta */
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(255, 105, 180, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(255, 105, 180, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(255, 105, 180, 0.5); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0) 0%, 
+    rgba(255,255,255,0.2) 50%, 
+    rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Animação para o prêmio selecionado */
+@keyframes prize-selected {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.prize-selected {
+  animation: prize-selected 0.5s ease-in-out;
+}
+
+/* Efeito de confete */
+@keyframes confetti-fall {
+  0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: #ff69b4;
+  animation: confetti-fall linear infinite;
 }
