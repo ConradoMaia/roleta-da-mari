@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/ConradoMaia/roleta-da-mar/static/css/main.a74d43a6.css",
-    "main.js": "/ConradoMaia/roleta-da-mar/static/js/main.ee2f044e.js",
+    "main.js": "/ConradoMaia/roleta-da-mar/static/js/main.72ef1462.js",
     "static/js/453.c4254205.chunk.js": "/ConradoMaia/roleta-da-mar/static/js/453.c4254205.chunk.js",
     "static/media/teste.jpg": "/ConradoMaia/roleta-da-mar/static/media/teste.ac9e6dc58f393727b83a.jpg",
     "index.html": "/ConradoMaia/roleta-da-mar/index.html",
     "main.a74d43a6.css.map": "/ConradoMaia/roleta-da-mar/static/css/main.a74d43a6.css.map",
-    "main.ee2f044e.js.map": "/ConradoMaia/roleta-da-mar/static/js/main.ee2f044e.js.map",
+    "main.72ef1462.js.map": "/ConradoMaia/roleta-da-mar/static/js/main.72ef1462.js.map",
     "453.c4254205.chunk.js.map": "/ConradoMaia/roleta-da-mar/static/js/453.c4254205.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.a74d43a6.css",
-    "static/js/main.ee2f044e.js"
+    "static/js/main.72ef1462.js"
   ]
 }

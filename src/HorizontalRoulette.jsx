@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 const validPrizes = ["Tênis", "Massagem", "Sushi", "Plantas", "Presente Surpresa"];
 const trollPrizes = ["Carro", "Casa", "Um milhão de beijos", "Perca a vez", "Viagem pra lua"];
 const allPrizes = [...validPrizes, ...trollPrizes];
 
-// Ícones para os prêmios
 const prizeIcons = {
   "Tênis": "👟",
   "Massagem": "💆‍♀️",
@@ -29,34 +28,7 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
   const animationRef = useRef(null);
   const timerRef = useRef(null);
 
-  const prizeWidth = 180;
-
-  useEffect(() => {
-    if (rolling) {
-      animationRef.current = requestAnimationFrame(scroll);
-      
-      // Aumenta a velocidade gradualmente para dar sensação de aceleração
-      const speedInterval = setInterval(() => {
-        setSpeed(prevSpeed => Math.min(prevSpeed + 1, 15));
-      }, 500);
-
-      // Define um tempo aleatório entre 3 e 5 segundos para parar a roleta
-      const stopTime = Math.random() * 2000 + 3000; // entre 3 e 5 segundos
-      timerRef.current = setTimeout(() => {
-        slowDown();
-      }, stopTime);
-      
-      return () => {
-        cancelAnimationFrame(animationRef.current);
-        clearInterval(speedInterval);
-        clearTimeout(timerRef.current);
-      };
-    } else {
-      cancelAnimationFrame(animationRef.current);
-    }
-  }, [rolling]);
-
-  const scroll = () => {
+  const scroll = useCallback(() => {
     if (containerRef.current) {
       containerRef.current.scrollLeft += speed;
       if (
@@ -67,9 +39,9 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
       }
     }
     animationRef.current = requestAnimationFrame(scroll);
-  };
+  }, [speed]);
 
-  const slowDown = () => {
+  const slowDown = useCallback(() => {
     setSpeed(prevSpeed => {
       if (prevSpeed <= 1) {
         cancelAnimationFrame(animationRef.current);
@@ -80,21 +52,45 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
       setTimeout(slowDown, 100);
       return prevSpeed * 0.9;
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    if (rolling) {
+      animationRef.current = requestAnimationFrame(scroll);
+
+      const speedInterval = setInterval(() => {
+        setSpeed(prev => Math.min(prev + 1, 15));
+      }, 500);
+
+      const stopTime = Math.random() * 2000 + 3000;
+      timerRef.current = setTimeout(() => {
+        slowDown();
+      }, stopTime);
+
+      return () => {
+        cancelAnimationFrame(animationRef.current);
+        clearInterval(speedInterval);
+        clearTimeout(timerRef.current);
+      };
+    } else {
+      cancelAnimationFrame(animationRef.current);
+    }
+  }, [rolling, scroll, slowDown]);
 
   const selectPrize = () => {
     const prize = validPrizes[count];
     setSelectedPrize(prize);
     setShowPrizeAnimation(true);
-    
+
     setTimeout(() => {
-      setWonPrizes([...wonPrizes, prize]);
+      const newWonPrizes = [...wonPrizes, prize];
+      setWonPrizes(newWonPrizes);
       setCount(count + 1);
       setShowPrizeAnimation(false);
-      
+
       setTimeout(() => {
         if (count + 1 === 5) {
-          onPrizeSelected([...wonPrizes, prize]);
+          onPrizeSelected(newWonPrizes);
         } else {
           setSpeed(5);
           setRolling(true);
@@ -121,19 +117,17 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
           </div>
         </div>
       )}
-      
+
       <div className="relative w-full max-w-3xl overflow-hidden rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 p-1">
         <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg p-4">
-          {/* Indicador de prêmio */}
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
             <div className="w-[3px] h-[80px] bg-yellow-400 rounded-full" style={{ boxShadow: '0 0 10px rgba(250,204,21,0.7)' }} />
-            <div className="w-6 h-6 bg-yellow-400 rounded-full -mt-3 ml-[-10px]" style={{ 
+            <div className="w-6 h-6 bg-yellow-400 rounded-full -mt-3 ml-[-10px]" style={{
               boxShadow: '0 0 15px rgba(250,204,21,0.9)',
               animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
             }} />
           </div>
-          
-          {/* Faixa de prêmios */}
+
           <div
             ref={containerRef}
             className="flex flex-row whitespace-nowrap overflow-hidden"
@@ -149,8 +143,8 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
                     key={index}
                     className={`flex flex-col items-center justify-center w-[180px] h-[100px] text-lg font-bold border-r-2 border-gray-200 transition-all`}
                     style={{
-                      background: isValid ? 
-                        'linear-gradient(to bottom, #f472b6, #ec4899)' : 
+                      background: isValid ?
+                        'linear-gradient(to bottom, #f472b6, #ec4899)' :
                         'linear-gradient(to bottom, #c084fc, #a855f7)'
                     }}
                   >
