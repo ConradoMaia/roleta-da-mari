@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const validPrizes = ["Tênis", "Massagem", "Sushi", "Plantas", "Presente Surpresa"];
 const trollPrizes = ["Carro", "Casa", "Um milhão de beijos", "Perca a vez", "Viagem pra lua"];
@@ -21,83 +21,57 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
   const [rolling, setRolling] = useState(true);
   const [wonPrizes, setWonPrizes] = useState([]);
   const [count, setCount] = useState(0);
-  const [speed, setSpeed] = useState(25); // velocidade inicial maior
-  const [selectedPrize, setSelectedPrize] = useState(null);
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [showPrizeAnimation, setShowPrizeAnimation] = useState(false);
-  const [slowing, setSlowing] = useState(false);
-  const containerRef = useRef(null);
-  const animationRef = useRef(null);
-  const timerRef = useRef(null);
+  const [selectedPrize, setSelectedPrize] = useState(null);
+  const [isSlowing, setIsSlowing] = useState(false);
+  const [intervalTime, setIntervalTime] = useState(60); // velocidade inicial
+  const intervalRef = useRef(null);
+  const stopIndexRef = useRef(null);
 
-  // Calcula o índice do item central visível
-  const getCenterIndex = () => {
-    if (!containerRef.current) return 0;
-    const scrollLeft = containerRef.current.scrollLeft;
-    const itemWidth = 180; // igual ao w-[180px]
-    return Math.round((scrollLeft + containerRef.current.offsetWidth / 2) / itemWidth) - 1;
-  };
-
-  // Função de rolagem
-  const scroll = useCallback(() => {
-    if (containerRef.current && rolling) {
-      containerRef.current.scrollLeft += speed;
-      if (
-        containerRef.current.scrollLeft >=
-        containerRef.current.scrollWidth - containerRef.current.offsetWidth
-      ) {
-        containerRef.current.scrollLeft = 0;
-      }
-      animationRef.current = requestAnimationFrame(scroll);
-    }
-  }, [speed, rolling]);
-
-  // Função para desacelerar
-  const slowDown = useCallback(() => {
-    setSlowing(true);
-  }, []);
-
+  // Inicia o sorteio
   useEffect(() => {
     if (rolling) {
-      animationRef.current = requestAnimationFrame(scroll);
+      let totalCycles = Math.floor(Math.random() * 3) + 4; // de 4 a 6 voltas completas
+      let totalItems = allPrizes.length;
+      let stopIndex = (Math.floor(Math.random() * validPrizes.length) + count) % totalItems;
+      // Garante que vai parar em um prêmio válido ainda não sorteado
+      let validIndexes = [];
+      allPrizes.forEach((prize, idx) => {
+        if (prize === validPrizes[count]) validIndexes.push(idx);
+      });
+      stopIndex = validIndexes[Math.floor(Math.random() * validIndexes.length)];
+      stopIndexRef.current = stopIndex + totalCycles * totalItems;
 
-      // Aumenta a velocidade gradualmente (opcional, pode remover se quiser sempre rápido)
-      // const speedInterval = setInterval(() => {
-      //   setSpeed(prev => Math.min(prev + 1, 30));
-      // }, 500);
+      let currentIndex = highlightedIndex;
+      let steps = 0;
+      let time = intervalTime;
 
-      const stopTime = Math.random() * 2000 + 3000;
-      timerRef.current = setTimeout(() => {
-        slowDown();
-      }, stopTime);
+      function runRoulette() {
+        setHighlightedIndex((prev) => (prev + 1) % totalItems);
+        steps++;
+        // Desacelera nos últimos 20 passos
+        if (stopIndexRef.current - steps < 20) {
+          time += 15;
+        }
+        if (steps < stopIndexRef.current) {
+          intervalRef.current = setTimeout(runRoulette, time);
+        } else {
+          setRolling(false);
+          setTimeout(() => {
+            showPrize();
+          }, 300);
+        }
+      }
+      runRoulette();
 
-      return () => {
-        cancelAnimationFrame(animationRef.current);
-        // clearInterval(speedInterval);
-        clearTimeout(timerRef.current);
-      };
-    } else {
-      cancelAnimationFrame(animationRef.current);
+      return () => clearTimeout(intervalRef.current);
     }
-  }, [rolling, scroll, slowDown]);
+    // eslint-disable-next-line
+  }, [rolling, count]);
 
-  useEffect(() => {
-    if (slowing && speed > 1) {
-      const timeout = setTimeout(() => {
-        setSpeed(prevSpeed => prevSpeed * 0.9);
-      }, 60); // desacelera mais rápido
-      return () => clearTimeout(timeout);
-    }
-    if (slowing && speed <= 1) {
-      setSpeed(0);
-      setRolling(false);
-      setSlowing(false);
-      selectPrize();
-    }
-  }, [slowing, speed]);
-
-  // Seleciona o prêmio
-  const selectPrize = () => {
-    const prize = validPrizes[count];
+  function showPrize() {
+    const prize = allPrizes[highlightedIndex % allPrizes.length];
     setSelectedPrize(prize);
     setShowPrizeAnimation(true);
 
@@ -111,15 +85,12 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
         if (count + 1 === 5) {
           onPrizeSelected(newWonPrizes);
         } else {
-          setSpeed(25); // reinicia rápido
           setRolling(true);
+          setIntervalTime(60);
         }
       }, 500);
     }, 2000);
-  };
-
-  // Calcula quais itens devem aparecer (3 próximos do centro)
-  const centerIndex = getCenterIndex();
+  }
 
   return (
     <div className="flex flex-col items-center gap-4 w-full">
@@ -142,43 +113,30 @@ export default function HorizontalRoulette({ onPrizeSelected }) {
 
       <div className="relative w-full max-w-3xl overflow-hidden rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 p-1">
         <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg p-4">
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none">
-            <div className="w-[3px] h-[80px] bg-yellow-400 rounded-full" style={{ boxShadow: '0 0 10px rgba(250,204,21,0.7)' }} />
-            <div className="w-6 h-6 bg-yellow-400 rounded-full -mt-3 ml-[-10px] animate-pulse" style={{
-              boxShadow: '0 0 15px rgba(250,204,21,0.9)'
-            }} />
-          </div>
-
-          <div
-            ref={containerRef}
-            className="flex flex-row whitespace-nowrap overflow-hidden"
-            style={{ height: "100px" }}
-          >
-            {Array(20)
-              .fill(0)
-              .flatMap(() => allPrizes)
-              .map((prize, index) => {
-                const isValid = validPrizes.includes(prize);
-                // Só mostra opaco os 3 próximos do centro, o resto fica transparente
-                const isVisible = Math.abs(index - centerIndex) <= 1;
-                return (
-                  <div
-                    key={index}
-                    className={`flex flex-col items-center justify-center w-[180px] h-[100px] text-lg font-bold border-r-2 border-gray-200 transition-all duration-200`}
-                    style={{
-                      background: isValid
-                        ? 'linear-gradient(to bottom, #f472b6, #ec4899)'
-                        : 'linear-gradient(to bottom, #c084fc, #a855f7)',
-                      opacity: isVisible ? 1 : 0.15,
-                      filter: isVisible ? 'none' : 'blur(1.5px)',
-                      transition: 'opacity 0.2s, filter 0.2s'
-                    }}
-                  >
-                    <div className="text-3xl mb-1">{prizeIcons[prize]}</div>
-                    <div className="text-white text-center px-2">{prize}</div>
-                  </div>
-                );
-              })}
+          <div className="flex flex-row justify-center items-center gap-2" style={{ minHeight: "100px" }}>
+            {allPrizes.map((prize, idx) => {
+              const isHighlighted = idx === (highlightedIndex % allPrizes.length);
+              const isValid = validPrizes.includes(prize);
+              return (
+                <div
+                  key={idx}
+                  className={`flex flex-col items-center justify-center w-[120px] h-[100px] text-lg font-bold border-2 rounded-lg mx-1 transition-all duration-150
+                    ${isHighlighted ? "border-yellow-400 scale-110 shadow-lg" : "border-transparent"}
+                  `}
+                  style={{
+                    background: isValid
+                      ? 'linear-gradient(to bottom, #f472b6, #ec4899)'
+                      : 'linear-gradient(to bottom, #c084fc, #a855f7)',
+                    opacity: isHighlighted ? 1 : 0.15,
+                    filter: isHighlighted ? 'none' : 'blur(1.5px)',
+                    transition: 'opacity 0.15s, filter 0.15s, transform 0.15s'
+                  }}
+                >
+                  <div className="text-3xl mb-1">{prizeIcons[prize]}</div>
+                  <div className="text-white text-center px-2">{prize}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
