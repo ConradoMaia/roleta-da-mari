@@ -100,9 +100,9 @@ export default function App() {
                 </li>
               ))}
             </ul>
-            <div style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '0.75rem', background: 'rgba(88,28,135,0.3)' }}>
+            <div style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid rgba(236,72,153,0.3)', borderRadius: '0.75rem', background: 'rgba(88,28,135,0.3)', color: 'white' }}>
               <p className="italic text-xl">
-                Espero que tenha gostado da surpresa... Agora é só me cobrar cada presentinho com muito amor 💘 Te amo! 💫
+                Tu mudou a minha vida de um jeito que eu nunca imaginei ser possível. Sou mtmtmtmt sortudo por te ter do meu lado. Sou gigantecamente feliz por acordar todos os dias pertinho de ti. Te amo com todo o meu coração! Meu solzinho psicologa 💖✨
               </p>
             </div>
             <button 
